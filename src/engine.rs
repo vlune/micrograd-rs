@@ -6,6 +6,7 @@ use std::rc::Rc;
 #[derive(Clone, Copy)]
 enum Op {
     Leaf,
+    Tanh,
     Add,
     Mul,
     Pow(f64),
@@ -33,6 +34,10 @@ impl Value {
             op,
             prev,
         })))
+    }
+
+    pub fn tanh(&self) -> Value {
+        Value::from_op(self.data().tanh(), Op::Tanh, vec![self.clone()])
     }
 
     pub fn data(&self) -> f64 {
@@ -151,6 +156,11 @@ impl Value {
                 let p = &inner.prev[0];
                 let active = if inner.data > 0.0 { 1.0 } else { 0.0 };
                 p.0.borrow_mut().grad += active * out_grad;
+            }
+            Op::Tanh => {
+                let p = &inner.prev[0];
+                let t = inner.data;
+                p.0.borrow_mut().grad += (1.0 - t * t) * out_grad;
             }
         }
     }

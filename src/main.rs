@@ -31,13 +31,21 @@ fn main() {
             let diff = &pred - &Value::new(*y);
             loss = &loss + &diff.pow(2.0);
         }
+        let n = xs.len() as f64;
+        let loss = &loss * &Value::new(1.0 / n);
         model.zero_grad();
         loss.backward();
 
-        model.step(0.05);
+        model.step(0.01);
 
         if k % 10 == 0 {
             println!("step {k:3} loss = {:.6}", loss.data());
         }
+    }
+    println!("\n--- predictions ---");
+    for (x, y) in xs.iter().zip(&ys) {
+        let inputs: Vec<Value> = x.iter().map(|&v| Value::new(v)).collect();
+        let pred = model.forward(&inputs).remove(0);
+        println!("target = {:5.1}   pred = {:8.4}", y, pred.data());
     }
 }
