@@ -50,6 +50,13 @@ impl Value {
         let d = self.data();
         Value::from_op(if d > 0.0 { d } else { 0.0 }, Op::Relu, vec![self.clone()])
     }
+    pub fn zero_grad(&self) {
+        self.0.borrow_mut().grad = 0.0;
+    }
+    pub fn sgd_step(&self, lr: f64) {
+        let mut inner = self.0.borrow_mut();
+        inner.data -= lr * inner.grad;
+    }
 }
 
 impl Add for &Value {
