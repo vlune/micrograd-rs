@@ -25,7 +25,7 @@ impl Neuron {
             .iter()
             .zip(x)
             .fold(self.b.clone(), |acc, (wi, xi)| &acc + &(wi * xi));
-        if self.nonlin { act.relu() } else { act }
+        if self.nonlin { act.tanh() } else { act }
     }
 
     pub fn parameters(&self) -> Vec<Value> {
